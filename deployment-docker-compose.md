@@ -1,6 +1,6 @@
 # FastAPI Project - Docker Compose Deployment
 
-You can deploy the project to your own remote server with Docker Compose. The deployment configuration includes Traefik to handle HTTPS and route incoming traffic to the application.
+You can deploy the project to your own remote server with Docker Compose. The deployment configuration includes Caddy to handle HTTPS and route incoming traffic to the application.
 
 ## Preparation
 
@@ -20,12 +20,15 @@ The `--filter=":- .gitignore"` option tells `rsync` to use the same ignore rules
 
 ### Environment Variables
 
-Set the application domain, project name, and first superuser email:
+Create an untracked `.env.production` file with the application domain, project name, first superuser email, and secrets. The production configuration must not use the development `.env` file:
 
 ```bash
-export DOMAIN=fastapi-project.example.com
-export PROJECT_NAME="Full Stack FastAPI Project"
-export FIRST_SUPERUSER=admin@example.com
+DOMAIN=fastapi-project.example.com
+PROJECT_NAME="Full Stack FastAPI Project"
+FIRST_SUPERUSER=admin@example.com
+POSTGRES_PASSWORD="replace-with-a-random-value"
+SECRET_KEY="replace-with-a-random-value"
+FIRST_SUPERUSER_PASSWORD="replace-with-a-random-value"
 ```
 
 You can also configure these environment variables as needed:
@@ -40,9 +43,7 @@ You can also configure these environment variables as needed:
 Generate and set secure values for the database password, token signing key, and first superuser password:
 
 ```bash
-export POSTGRES_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
-export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
-export FIRST_SUPERUSER_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+python -c 'import secrets; print(secrets.token_urlsafe(32))'
 ```
 
 To use an authenticated email provider, also set `SMTP_PASSWORD`.
@@ -51,9 +52,9 @@ To use an authenticated email provider, also set `SMTP_PASSWORD`.
 
 ```bash
 cd /root/code/app/
-docker compose -f compose.yml -f compose.deploy.yml build
-docker compose -f compose.yml -f compose.deploy.yml run --rm backend bash scripts/prestart.sh
-docker compose -f compose.yml -f compose.deploy.yml up -d
+docker compose --env-file .env.production -f compose.yml -f compose.deploy.yml build
+docker compose --env-file .env.production -f compose.yml -f compose.deploy.yml run --rm backend bash scripts/prestart.sh
+docker compose --env-file .env.production -f compose.yml -f compose.deploy.yml up -d
 ```
 
 The `compose.deploy.yml` file adds HTTPS and automatic certificate handling to the shared `compose.yml` configuration. Explicitly listing both files excludes the local settings from `compose.override.yml`.

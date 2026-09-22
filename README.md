@@ -18,7 +18,7 @@
   - 🦇 Dark mode support.
 - ☁️ [FastAPI Cloud](https://fastapicloud.com) for deployment.
 - 🐋 [Docker Compose](https://www.docker.com) for local services and self-hosted deployment.
-  - 📞 [Traefik](https://traefik.io) as a reverse proxy with automatic HTTPS.
+  - 📞 [Caddy](https://caddyserver.com) as a reverse proxy with automatic HTTPS.
 - 🔒 Secure password hashing by default.
 - 🔑 JWT (JSON Web Token) authentication.
 - 📫 Email-based password recovery.

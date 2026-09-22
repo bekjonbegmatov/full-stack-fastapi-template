@@ -1,0 +1,4 @@
+{$CADDY_SITE_ADDRESS:http://localhost} {
+	encode zstd gzip
+	reverse_proxy backend:8000
+}

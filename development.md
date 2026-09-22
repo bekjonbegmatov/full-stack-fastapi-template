@@ -69,8 +69,6 @@ Automatic interactive API documentation with Swagger UI: <http://localhost:8000/
 
 Adminer, database web administration: <http://localhost:8080>
 
-Traefik UI, to see how the routes are being handled by the proxy: <http://localhost:8090>
-
 Mailpit: <http://localhost:8025>
 
 Stop a locally running FastAPI server before starting the Compose backend because both use port `8000`.
