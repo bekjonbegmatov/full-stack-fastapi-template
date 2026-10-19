@@ -35,6 +35,11 @@ export type Body_login_login_access_token = {
 };
 
 /**
+ * CheckMethod
+ */
+export type CheckMethod = 'tcp' | 'http';
+
+/**
  * HTTPValidationError
  */
 export type HTTPValidationError = {
@@ -123,6 +128,113 @@ export type Message = {
 };
 
 /**
+ * MonitoredServiceCreate
+ */
+export type MonitoredServiceCreate = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Address
+     */
+    address: string;
+    /**
+     * Ports
+     */
+    ports?: Array<number>;
+    check_method?: CheckMethod;
+    /**
+     * Check Interval Seconds
+     */
+    check_interval_seconds?: number;
+    /**
+     * Note
+     */
+    note?: string | null;
+};
+
+/**
+ * MonitoredServicePublic
+ */
+export type MonitoredServicePublic = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Address
+     */
+    address: string;
+    /**
+     * Ports
+     */
+    ports?: Array<number>;
+    check_method?: CheckMethod;
+    /**
+     * Check Interval Seconds
+     */
+    check_interval_seconds?: number;
+    /**
+     * Note
+     */
+    note?: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Resource Group Id
+     */
+    resource_group_id: string;
+    /**
+     * Created At
+     */
+    created_at?: string | null;
+};
+
+/**
+ * MonitoredServiceUpdate
+ */
+export type MonitoredServiceUpdate = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Address
+     */
+    address?: string | null;
+    /**
+     * Ports
+     */
+    ports?: Array<number> | null;
+    check_method?: CheckMethod | null;
+    /**
+     * Check Interval Seconds
+     */
+    check_interval_seconds?: number | null;
+    /**
+     * Note
+     */
+    note?: string | null;
+};
+
+/**
+ * MonitoredServicesPublic
+ */
+export type MonitoredServicesPublic = {
+    /**
+     * Data
+     */
+    data: Array<MonitoredServicePublic>;
+    /**
+     * Count
+     */
+    count: number;
+};
+
+/**
  * NewPassword
  */
 export type NewPassword = {
@@ -156,6 +268,78 @@ export type PrivateUserCreate = {
      * Is Verified
      */
     is_verified?: boolean;
+};
+
+/**
+ * ResourceGroupCreate
+ */
+export type ResourceGroupCreate = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description?: string | null;
+};
+
+/**
+ * ResourceGroupPublic
+ */
+export type ResourceGroupPublic = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Owner Id
+     */
+    owner_id: string;
+    /**
+     * Created At
+     */
+    created_at?: string | null;
+    /**
+     * Services Count
+     */
+    services_count?: number;
+};
+
+/**
+ * ResourceGroupUpdate
+ */
+export type ResourceGroupUpdate = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+};
+
+/**
+ * ResourceGroupsPublic
+ */
+export type ResourceGroupsPublic = {
+    /**
+     * Data
+     */
+    data: Array<ResourceGroupPublic>;
+    /**
+     * Count
+     */
+    count: number;
 };
 
 /**
@@ -920,6 +1104,283 @@ export type itemsUpdateItemResponses = {
 };
 
 export type itemsUpdateItemResponse = itemsUpdateItemResponses[keyof itemsUpdateItemResponses];
+
+export type monitoringReadResourceGroupsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Skip
+         */
+        skip?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/resource-groups/';
+};
+
+export type monitoringReadResourceGroupsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringReadResourceGroupsError = monitoringReadResourceGroupsErrors[keyof monitoringReadResourceGroupsErrors];
+
+export type monitoringReadResourceGroupsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ResourceGroupsPublic;
+};
+
+export type monitoringReadResourceGroupsResponse = monitoringReadResourceGroupsResponses[keyof monitoringReadResourceGroupsResponses];
+
+export type monitoringCreateResourceGroupData = {
+    body: ResourceGroupCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/resource-groups/';
+};
+
+export type monitoringCreateResourceGroupErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringCreateResourceGroupError = monitoringCreateResourceGroupErrors[keyof monitoringCreateResourceGroupErrors];
+
+export type monitoringCreateResourceGroupResponses = {
+    /**
+     * Successful Response
+     */
+    200: ResourceGroupPublic;
+};
+
+export type monitoringCreateResourceGroupResponse = monitoringCreateResourceGroupResponses[keyof monitoringCreateResourceGroupResponses];
+
+export type monitoringDeleteResourceGroupData = {
+    body?: never;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}';
+};
+
+export type monitoringDeleteResourceGroupErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringDeleteResourceGroupError = monitoringDeleteResourceGroupErrors[keyof monitoringDeleteResourceGroupErrors];
+
+export type monitoringDeleteResourceGroupResponses = {
+    /**
+     * Successful Response
+     */
+    200: Message;
+};
+
+export type monitoringDeleteResourceGroupResponse = monitoringDeleteResourceGroupResponses[keyof monitoringDeleteResourceGroupResponses];
+
+export type monitoringReadResourceGroupData = {
+    body?: never;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}';
+};
+
+export type monitoringReadResourceGroupErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringReadResourceGroupError = monitoringReadResourceGroupErrors[keyof monitoringReadResourceGroupErrors];
+
+export type monitoringReadResourceGroupResponses = {
+    /**
+     * Successful Response
+     */
+    200: ResourceGroupPublic;
+};
+
+export type monitoringReadResourceGroupResponse = monitoringReadResourceGroupResponses[keyof monitoringReadResourceGroupResponses];
+
+export type monitoringUpdateResourceGroupData = {
+    body: ResourceGroupUpdate;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}';
+};
+
+export type monitoringUpdateResourceGroupErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringUpdateResourceGroupError = monitoringUpdateResourceGroupErrors[keyof monitoringUpdateResourceGroupErrors];
+
+export type monitoringUpdateResourceGroupResponses = {
+    /**
+     * Successful Response
+     */
+    200: ResourceGroupPublic;
+};
+
+export type monitoringUpdateResourceGroupResponse = monitoringUpdateResourceGroupResponses[keyof monitoringUpdateResourceGroupResponses];
+
+export type monitoringReadServicesData = {
+    body?: never;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}/services';
+};
+
+export type monitoringReadServicesErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringReadServicesError = monitoringReadServicesErrors[keyof monitoringReadServicesErrors];
+
+export type monitoringReadServicesResponses = {
+    /**
+     * Successful Response
+     */
+    200: MonitoredServicesPublic;
+};
+
+export type monitoringReadServicesResponse = monitoringReadServicesResponses[keyof monitoringReadServicesResponses];
+
+export type monitoringCreateServiceData = {
+    body: MonitoredServiceCreate;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}/services';
+};
+
+export type monitoringCreateServiceErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringCreateServiceError = monitoringCreateServiceErrors[keyof monitoringCreateServiceErrors];
+
+export type monitoringCreateServiceResponses = {
+    /**
+     * Successful Response
+     */
+    200: MonitoredServicePublic;
+};
+
+export type monitoringCreateServiceResponse = monitoringCreateServiceResponses[keyof monitoringCreateServiceResponses];
+
+export type monitoringDeleteServiceData = {
+    body?: never;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+        /**
+         * Service Id
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}/services/{service_id}';
+};
+
+export type monitoringDeleteServiceErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringDeleteServiceError = monitoringDeleteServiceErrors[keyof monitoringDeleteServiceErrors];
+
+export type monitoringDeleteServiceResponses = {
+    /**
+     * Successful Response
+     */
+    200: Message;
+};
+
+export type monitoringDeleteServiceResponse = monitoringDeleteServiceResponses[keyof monitoringDeleteServiceResponses];
+
+export type monitoringUpdateServiceData = {
+    body: MonitoredServiceUpdate;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+        /**
+         * Service Id
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}/services/{service_id}';
+};
+
+export type monitoringUpdateServiceErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringUpdateServiceError = monitoringUpdateServiceErrors[keyof monitoringUpdateServiceErrors];
+
+export type monitoringUpdateServiceResponses = {
+    /**
+     * Successful Response
+     */
+    200: MonitoredServicePublic;
+};
+
+export type monitoringUpdateServiceResponse = monitoringUpdateServiceResponses[keyof monitoringUpdateServiceResponses];
 
 export type privateCreateUserData = {
     body: PrivateUserCreate;

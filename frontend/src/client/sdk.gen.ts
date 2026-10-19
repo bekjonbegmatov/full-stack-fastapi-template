@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { itemsCreateItemData, itemsCreateItemErrors, itemsCreateItemResponses, itemsDeleteItemData, itemsDeleteItemErrors, itemsDeleteItemResponses, itemsReadItemData, itemsReadItemErrors, itemsReadItemResponses, itemsReadItemsData, itemsReadItemsErrors, itemsReadItemsResponses, itemsUpdateItemData, itemsUpdateItemErrors, itemsUpdateItemResponses, loginLoginAccessTokenData, loginLoginAccessTokenErrors, loginLoginAccessTokenResponses, loginRecoverPasswordData, loginRecoverPasswordErrors, loginRecoverPasswordHtmlContentData, loginRecoverPasswordHtmlContentErrors, loginRecoverPasswordHtmlContentResponses, loginRecoverPasswordResponses, loginResetPasswordData, loginResetPasswordErrors, loginResetPasswordResponses, loginTestTokenData, loginTestTokenResponses, privateCreateUserData, privateCreateUserErrors, privateCreateUserResponses, usersCreateUserData, usersCreateUserErrors, usersCreateUserResponses, usersDeleteUserData, usersDeleteUserErrors, usersDeleteUserMeData, usersDeleteUserMeResponses, usersDeleteUserResponses, usersReadUserByIdData, usersReadUserByIdErrors, usersReadUserByIdResponses, usersReadUserMeData, usersReadUserMeResponses, usersReadUsersData, usersReadUsersErrors, usersReadUsersResponses, usersRegisterUserData, usersRegisterUserErrors, usersRegisterUserResponses, usersUpdatePasswordMeData, usersUpdatePasswordMeErrors, usersUpdatePasswordMeResponses, usersUpdateUserData, usersUpdateUserErrors, usersUpdateUserMeData, usersUpdateUserMeErrors, usersUpdateUserMeResponses, usersUpdateUserResponses, utilsHealthCheckData, utilsHealthCheckResponses, utilsTestEmailData, utilsTestEmailErrors, utilsTestEmailResponses } from './types.gen';
+import type { itemsCreateItemData, itemsCreateItemErrors, itemsCreateItemResponses, itemsDeleteItemData, itemsDeleteItemErrors, itemsDeleteItemResponses, itemsReadItemData, itemsReadItemErrors, itemsReadItemResponses, itemsReadItemsData, itemsReadItemsErrors, itemsReadItemsResponses, itemsUpdateItemData, itemsUpdateItemErrors, itemsUpdateItemResponses, loginLoginAccessTokenData, loginLoginAccessTokenErrors, loginLoginAccessTokenResponses, loginRecoverPasswordData, loginRecoverPasswordErrors, loginRecoverPasswordHtmlContentData, loginRecoverPasswordHtmlContentErrors, loginRecoverPasswordHtmlContentResponses, loginRecoverPasswordResponses, loginResetPasswordData, loginResetPasswordErrors, loginResetPasswordResponses, loginTestTokenData, loginTestTokenResponses, monitoringCreateResourceGroupData, monitoringCreateResourceGroupErrors, monitoringCreateResourceGroupResponses, monitoringCreateServiceData, monitoringCreateServiceErrors, monitoringCreateServiceResponses, monitoringDeleteResourceGroupData, monitoringDeleteResourceGroupErrors, monitoringDeleteResourceGroupResponses, monitoringDeleteServiceData, monitoringDeleteServiceErrors, monitoringDeleteServiceResponses, monitoringReadResourceGroupData, monitoringReadResourceGroupErrors, monitoringReadResourceGroupResponses, monitoringReadResourceGroupsData, monitoringReadResourceGroupsErrors, monitoringReadResourceGroupsResponses, monitoringReadServicesData, monitoringReadServicesErrors, monitoringReadServicesResponses, monitoringUpdateResourceGroupData, monitoringUpdateResourceGroupErrors, monitoringUpdateResourceGroupResponses, monitoringUpdateServiceData, monitoringUpdateServiceErrors, monitoringUpdateServiceResponses, privateCreateUserData, privateCreateUserErrors, privateCreateUserResponses, usersCreateUserData, usersCreateUserErrors, usersCreateUserResponses, usersDeleteUserData, usersDeleteUserErrors, usersDeleteUserMeData, usersDeleteUserMeResponses, usersDeleteUserResponses, usersReadUserByIdData, usersReadUserByIdErrors, usersReadUserByIdResponses, usersReadUserMeData, usersReadUserMeResponses, usersReadUsersData, usersReadUsersErrors, usersReadUsersResponses, usersRegisterUserData, usersRegisterUserErrors, usersRegisterUserResponses, usersUpdatePasswordMeData, usersUpdatePasswordMeErrors, usersUpdatePasswordMeResponses, usersUpdateUserData, usersUpdateUserErrors, usersUpdateUserMeData, usersUpdateUserMeErrors, usersUpdateUserMeResponses, usersUpdateUserResponses, utilsHealthCheckData, utilsHealthCheckResponses, utilsTestEmailData, utilsTestEmailErrors, utilsTestEmailResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -36,7 +36,7 @@ export class LoginService {
             }
         });
     }
-    
+
     /**
      * Test Token
      *
@@ -50,7 +50,7 @@ export class LoginService {
             ...options
         });
     }
-    
+
     /**
      * Recover Password
      *
@@ -63,7 +63,7 @@ export class LoginService {
             ...options
         });
     }
-    
+
     /**
      * Reset Password
      *
@@ -80,7 +80,7 @@ export class LoginService {
             }
         });
     }
-    
+
     /**
      * Recover Password Html Content
      *
@@ -110,7 +110,7 @@ export class UsersService {
             ...options
         });
     }
-    
+
     /**
      * Create User
      *
@@ -128,7 +128,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Delete User Me
      *
@@ -142,7 +142,7 @@ export class UsersService {
             ...options
         });
     }
-    
+
     /**
      * Read User Me
      *
@@ -156,7 +156,7 @@ export class UsersService {
             ...options
         });
     }
-    
+
     /**
      * Update User Me
      *
@@ -174,7 +174,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Update Password Me
      *
@@ -192,7 +192,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Register User
      *
@@ -209,7 +209,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Delete User
      *
@@ -223,7 +223,7 @@ export class UsersService {
             ...options
         });
     }
-    
+
     /**
      * Read User By Id
      *
@@ -237,7 +237,7 @@ export class UsersService {
             ...options
         });
     }
-    
+
     /**
      * Update User
      *
@@ -271,7 +271,7 @@ export class UtilsService {
             ...options
         });
     }
-    
+
     /**
      * Health Check
      */
@@ -298,7 +298,7 @@ export class ItemsService {
             ...options
         });
     }
-    
+
     /**
      * Create Item
      *
@@ -316,7 +316,7 @@ export class ItemsService {
             }
         });
     }
-    
+
     /**
      * Delete Item
      *
@@ -330,7 +330,7 @@ export class ItemsService {
             ...options
         });
     }
-    
+
     /**
      * Read Item
      *
@@ -344,7 +344,7 @@ export class ItemsService {
             ...options
         });
     }
-    
+
     /**
      * Update Item
      *
@@ -355,6 +355,132 @@ export class ItemsService {
             responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/v1/items/{id}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+}
+
+export class MonitoringService {
+    /**
+     * Read Resource Groups
+     */
+    public static readResourceGroups<ThrowOnError extends boolean = true>(options?: Options<monitoringReadResourceGroupsData, ThrowOnError>) {
+        return (options?.client ?? client).get<monitoringReadResourceGroupsResponses, monitoringReadResourceGroupsErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/',
+            ...options
+        });
+    }
+
+    /**
+     * Create Resource Group
+     */
+    public static createResourceGroup<ThrowOnError extends boolean = true>(options: Options<monitoringCreateResourceGroupData, ThrowOnError>) {
+        return (options.client ?? client).post<monitoringCreateResourceGroupResponses, monitoringCreateResourceGroupErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+
+    /**
+     * Delete Resource Group
+     */
+    public static deleteResourceGroup<ThrowOnError extends boolean = true>(options: Options<monitoringDeleteResourceGroupData, ThrowOnError>) {
+        return (options.client ?? client).delete<monitoringDeleteResourceGroupResponses, monitoringDeleteResourceGroupErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/{group_id}',
+            ...options
+        });
+    }
+
+    /**
+     * Read Resource Group
+     */
+    public static readResourceGroup<ThrowOnError extends boolean = true>(options: Options<monitoringReadResourceGroupData, ThrowOnError>) {
+        return (options.client ?? client).get<monitoringReadResourceGroupResponses, monitoringReadResourceGroupErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/{group_id}',
+            ...options
+        });
+    }
+
+    /**
+     * Update Resource Group
+     */
+    public static updateResourceGroup<ThrowOnError extends boolean = true>(options: Options<monitoringUpdateResourceGroupData, ThrowOnError>) {
+        return (options.client ?? client).put<monitoringUpdateResourceGroupResponses, monitoringUpdateResourceGroupErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/{group_id}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+
+    /**
+     * Read Services
+     */
+    public static readServices<ThrowOnError extends boolean = true>(options: Options<monitoringReadServicesData, ThrowOnError>) {
+        return (options.client ?? client).get<monitoringReadServicesResponses, monitoringReadServicesErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/{group_id}/services',
+            ...options
+        });
+    }
+
+    /**
+     * Create Service
+     */
+    public static createService<ThrowOnError extends boolean = true>(options: Options<monitoringCreateServiceData, ThrowOnError>) {
+        return (options.client ?? client).post<monitoringCreateServiceResponses, monitoringCreateServiceErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/{group_id}/services',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+
+    /**
+     * Delete Service
+     */
+    public static deleteService<ThrowOnError extends boolean = true>(options: Options<monitoringDeleteServiceData, ThrowOnError>) {
+        return (options.client ?? client).delete<monitoringDeleteServiceResponses, monitoringDeleteServiceErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/{group_id}/services/{service_id}',
+            ...options
+        });
+    }
+
+    /**
+     * Update Service
+     */
+    public static updateService<ThrowOnError extends boolean = true>(options: Options<monitoringUpdateServiceData, ThrowOnError>) {
+        return (options.client ?? client).put<monitoringUpdateServiceResponses, monitoringUpdateServiceErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/{group_id}/services/{service_id}',
             ...options,
             headers: {
                 'Content-Type': 'application/json',
