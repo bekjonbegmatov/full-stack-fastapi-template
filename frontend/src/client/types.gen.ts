@@ -82,6 +82,11 @@ export type AgentTasksPublic = {
 };
 
 /**
+ * AvailabilityStatus
+ */
+export type AvailabilityStatus = 'up' | 'down' | 'partial' | 'unknown';
+
+/**
  * Body_login-login_access_token
  */
 export type Body_login_login_access_token = {
@@ -387,6 +392,7 @@ export type MonitoredServicePublic = {
      * Agent Ids
      */
     agent_ids?: Array<string>;
+    availability?: AvailabilityStatus;
 };
 
 /**

@@ -11,6 +11,13 @@ export const Route = createFileRoute("/_layout/monitoring/$groupId")({
   component: GroupPage,
 })
 
+const availability = {
+  up: { label: "Доступен", color: "text-emerald-500" },
+  down: { label: "Недоступен", color: "text-rose-500" },
+  partial: { label: "Частично доступен", color: "text-amber-500" },
+  unknown: { label: "Нет свежих данных", color: "text-amber-500" },
+}
+
 function GroupPage() {
   const { groupId } = Route.useParams()
   const group = useQuery({
@@ -27,6 +34,7 @@ function GroupPage() {
     queryFn: async () =>
       (await MonitoringService.readServices({ path: { group_id: groupId } }))
         .data,
+    refetchInterval: 30000,
   })
 
   if (group.isLoading || services.isLoading) {
@@ -70,7 +78,17 @@ function GroupPage() {
                     "flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm font-medium text-primary",
                 }}
               >
-                <Server className="size-4" />
+                <Server
+                  role="img"
+                  aria-label={
+                    availability[service.availability ?? "unknown"].label
+                  }
+                  className={`size-4 shrink-0 ${availability[service.availability ?? "unknown"].color}`}
+                >
+                  <title>
+                    {availability[service.availability ?? "unknown"].label}
+                  </title>
+                </Server>
                 <span className="truncate">{service.name}</span>
               </Link>
             ))}

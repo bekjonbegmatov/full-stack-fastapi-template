@@ -110,13 +110,15 @@ function ServiceDetails({
   const states = assigned.map((item) => agentState(item.id, latest, service))
   const up = states.filter((state) => state === "up").length
   const down = states.filter((state) => state === "down").length
-  const statusLabel = down
-    ? up
-      ? "Частично недоступен"
-      : "Недоступен"
-    : up === assigned.length && up > 0
-      ? "Доступен"
-      : "Нет свежих данных"
+  const partial =
+    (up > 0 || down > 0) && up !== assigned.length && down !== assigned.length
+  const statusLabel = partial
+    ? "Частично недоступен"
+    : down
+      ? "Недоступен"
+      : up === assigned.length && up > 0
+        ? "Доступен"
+        : "Нет свежих данных"
   const total = reports.data?.count ?? 0
   const pages = Math.max(1, Math.ceil(total / pageSize))
   const certificate = stats.data?.certificate_expires_at
@@ -163,12 +165,19 @@ function ServiceDetails({
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="break-words text-2xl font-bold">{service.name}</h2>
             <Badge
+              className={
+                partial
+                  ? "border-amber-500/40 bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                  : undefined
+              }
               variant={
-                down
-                  ? "destructive"
-                  : up === assigned.length && up > 0
-                    ? "default"
-                    : "secondary"
+                partial
+                  ? "outline"
+                  : down
+                    ? "destructive"
+                    : up === assigned.length && up > 0
+                      ? "default"
+                      : "secondary"
               }
             >
               {statusLabel}

@@ -180,6 +180,13 @@ class CheckStatus(StrEnum):
     error = "error"
 
 
+class AvailabilityStatus(StrEnum):
+    up = "up"
+    down = "down"
+    partial = "partial"
+    unknown = "unknown"
+
+
 class MonitoredServiceBase(SQLModel):
     name: str = Field(min_length=1, max_length=255)
     address: str = Field(min_length=1, max_length=255)
@@ -251,6 +258,7 @@ class MonitoredServicePublic(MonitoredServiceBase):
     resource_group_id: uuid.UUID
     created_at: datetime | None = None
     agent_ids: list[uuid.UUID] = Field(default_factory=list)
+    availability: AvailabilityStatus = AvailabilityStatus.unknown
 
 
 class MonitoredServicesPublic(SQLModel):

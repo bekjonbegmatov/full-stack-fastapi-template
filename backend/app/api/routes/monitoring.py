@@ -7,6 +7,8 @@ from sqlmodel import col, func, select
 
 from app.api.deps import CurrentUser, SessionDep
 from app.models import (
+    AvailabilityStatus,
+    CheckMethod,
     CheckReport,
     CheckReportPublic,
     CheckReportsPublic,
@@ -82,8 +84,52 @@ def service_public(
     agent_ids = session.exec(
         select(ServiceAgent.agent_id).where(ServiceAgent.service_id == service.id)
     ).all()
+    now = datetime.now(UTC)
+    fresh_after = now - timedelta(seconds=max(120, service.check_interval_seconds * 3))
+    # Для иконки берём только свежий результат каждого порта и назначенного агента.
+    latest = (
+        session.exec(
+            select(CheckReport)
+            .where(
+                CheckReport.service_id == service.id,
+                col(CheckReport.agent_id).in_(agent_ids),
+                CheckReport.checked_at >= fresh_after,
+                CheckReport.checked_at <= now,
+            )
+            .distinct(CheckReport.agent_id, CheckReport.port)
+            .order_by(
+                CheckReport.agent_id,
+                CheckReport.port,
+                col(CheckReport.checked_at).desc(),
+                CheckReport.id,
+            )
+        ).all()
+        if agent_ids
+        else []
+    )
+    by_port = {(report.agent_id, report.port): report for report in latest}
+    ports = (
+        [None] if service.check_method == CheckMethod.ping else service.ports or [None]
+    )
+    states = []
+    for agent_id in agent_ids:
+        reports = [by_port.get((agent_id, port)) for port in ports]
+        if any(report and report.status != CheckStatus.up for report in reports):
+            states.append(AvailabilityStatus.down)
+        elif all(report is not None for report in reports):
+            states.append(AvailabilityStatus.up)
+        else:
+            states.append(AvailabilityStatus.unknown)
+
+    availability = AvailabilityStatus.unknown
+    if states and all(state == AvailabilityStatus.up for state in states):
+        availability = AvailabilityStatus.up
+    elif states and all(state == AvailabilityStatus.down for state in states):
+        availability = AvailabilityStatus.down
+    elif any(state != AvailabilityStatus.unknown for state in states):
+        availability = AvailabilityStatus.partial
     return MonitoredServicePublic.model_validate(
-        service, update={"agent_ids": agent_ids}
+        service, update={"agent_ids": agent_ids, "availability": availability}
     )
 
 

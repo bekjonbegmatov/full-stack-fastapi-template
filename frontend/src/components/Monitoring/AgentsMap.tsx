@@ -1,10 +1,11 @@
 import { Minus, Plus, RotateCcw } from "lucide-react"
-import { useState } from "react"
+import { type ReactNode, useState } from "react"
 import {
   ComposableMap,
   Geographies,
   Geography,
   Marker,
+  useZoomPanContext,
   ZoomableGroup,
 } from "react-simple-maps"
 import type {
@@ -18,6 +19,22 @@ import { agentState, states } from "./status"
 
 const countryData: Record<string, { name: string; coordinates: number[] }> =
   countries
+
+function FixedSizeMarker({
+  coordinates,
+  children,
+}: {
+  coordinates: [number, number]
+  children: ReactNode
+}) {
+  const { k } = useZoomPanContext()
+  // Карта увеличивается, а размер метки остаётся прежним даже во время жеста.
+  return (
+    <Marker coordinates={coordinates}>
+      <g transform={`scale(${1 / k})`}>{children}</g>
+    </Marker>
+  )
+}
 
 type Props = {
   agents: MonitoringAgentPublic[]
@@ -160,7 +177,7 @@ export function AgentsMap({
                 if (countryAgents.length === 1) onSelect(countryAgents[0].id)
               }
               return (
-                <Marker
+                <FixedSizeMarker
                   key={code}
                   coordinates={[country.coordinates[0], country.coordinates[1]]}
                 >
@@ -207,7 +224,7 @@ export function AgentsMap({
                       {country.name}: {states[state].label}
                     </title>
                   </g>
-                </Marker>
+                </FixedSizeMarker>
               )
             })}
           </ZoomableGroup>
