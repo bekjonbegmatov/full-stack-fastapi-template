@@ -5,6 +5,79 @@ export type ClientOptions = {
 };
 
 /**
+ * AgentReportCreate
+ */
+export type AgentReportCreate = {
+    /**
+     * Service Id
+     */
+    service_id: string;
+    /**
+     * Port
+     */
+    port?: number | null;
+    status: CheckStatus;
+    /**
+     * Latency Ms
+     */
+    latency_ms?: number | null;
+    /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
+     * Checked At
+     */
+    checked_at?: string;
+};
+
+/**
+ * AgentTask
+ */
+export type AgentTask = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Address
+     */
+    address: string;
+    /**
+     * Ports
+     */
+    ports: Array<number>;
+    check_method: CheckMethod;
+    http_method: HttpMethod;
+    /**
+     * Http Path
+     */
+    http_path: string;
+    /**
+     * Expected Status
+     */
+    expected_status: number;
+    /**
+     * Check Interval Seconds
+     */
+    check_interval_seconds: number;
+};
+
+/**
+ * AgentTasksPublic
+ */
+export type AgentTasksPublic = {
+    /**
+     * Data
+     */
+    data: Array<AgentTask>;
+};
+
+/**
  * Body_login-login_access_token
  */
 export type Body_login_login_access_token = {
@@ -40,6 +113,52 @@ export type Body_login_login_access_token = {
 export type CheckMethod = 'tcp' | 'http';
 
 /**
+ * CheckReportPublic
+ */
+export type CheckReportPublic = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Service Id
+     */
+    service_id: string;
+    /**
+     * Port
+     */
+    port?: number | null;
+    status: CheckStatus;
+    /**
+     * Latency Ms
+     */
+    latency_ms?: number | null;
+    /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
+     * Checked At
+     */
+    checked_at: string;
+};
+
+/**
+ * CheckReportsPublic
+ */
+export type CheckReportsPublic = {
+    /**
+     * Data
+     */
+    data: Array<CheckReportPublic>;
+};
+
+/**
+ * CheckStatus
+ */
+export type CheckStatus = 'up' | 'down' | 'error';
+
+/**
  * HTTPValidationError
  */
 export type HTTPValidationError = {
@@ -48,6 +167,11 @@ export type HTTPValidationError = {
      */
     detail?: Array<ValidationError>;
 };
+
+/**
+ * HttpMethod
+ */
+export type HttpMethod = 'GET' | 'POST' | 'HEAD';
 
 /**
  * ItemCreate
@@ -144,6 +268,15 @@ export type MonitoredServiceCreate = {
      */
     ports?: Array<number>;
     check_method?: CheckMethod;
+    http_method?: HttpMethod;
+    /**
+     * Http Path
+     */
+    http_path?: string;
+    /**
+     * Expected Status
+     */
+    expected_status?: number;
     /**
      * Check Interval Seconds
      */
@@ -152,6 +285,10 @@ export type MonitoredServiceCreate = {
      * Note
      */
     note?: string | null;
+    /**
+     * Agent Id
+     */
+    agent_id?: string | null;
 };
 
 /**
@@ -171,6 +308,15 @@ export type MonitoredServicePublic = {
      */
     ports?: Array<number>;
     check_method?: CheckMethod;
+    http_method?: HttpMethod;
+    /**
+     * Http Path
+     */
+    http_path?: string;
+    /**
+     * Expected Status
+     */
+    expected_status?: number;
     /**
      * Check Interval Seconds
      */
@@ -191,6 +337,10 @@ export type MonitoredServicePublic = {
      * Created At
      */
     created_at?: string | null;
+    /**
+     * Agent Id
+     */
+    agent_id?: string | null;
 };
 
 /**
@@ -210,6 +360,15 @@ export type MonitoredServiceUpdate = {
      */
     ports?: Array<number> | null;
     check_method?: CheckMethod | null;
+    http_method?: HttpMethod | null;
+    /**
+     * Http Path
+     */
+    http_path?: string | null;
+    /**
+     * Expected Status
+     */
+    expected_status?: number | null;
     /**
      * Check Interval Seconds
      */
@@ -218,6 +377,10 @@ export type MonitoredServiceUpdate = {
      * Note
      */
     note?: string | null;
+    /**
+     * Agent Id
+     */
+    agent_id?: string | null;
 };
 
 /**
@@ -228,6 +391,82 @@ export type MonitoredServicesPublic = {
      * Data
      */
     data: Array<MonitoredServicePublic>;
+    /**
+     * Count
+     */
+    count: number;
+};
+
+/**
+ * MonitoringAgentCreate
+ */
+export type MonitoringAgentCreate = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Location
+     */
+    location?: string | null;
+};
+
+/**
+ * MonitoringAgentPublic
+ */
+export type MonitoringAgentPublic = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Location
+     */
+    location?: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Token
+     */
+    token: string;
+    /**
+     * Owner Id
+     */
+    owner_id: string;
+    /**
+     * Created At
+     */
+    created_at?: string | null;
+    /**
+     * Last Seen At
+     */
+    last_seen_at?: string | null;
+};
+
+/**
+ * MonitoringAgentUpdate
+ */
+export type MonitoringAgentUpdate = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Location
+     */
+    location?: string | null;
+};
+
+/**
+ * MonitoringAgentsPublic
+ */
+export type MonitoringAgentsPublic = {
+    /**
+     * Data
+     */
+    data: Array<MonitoringAgentPublic>;
     /**
      * Count
      */
@@ -1381,6 +1620,206 @@ export type monitoringUpdateServiceResponses = {
 };
 
 export type monitoringUpdateServiceResponse = monitoringUpdateServiceResponses[keyof monitoringUpdateServiceResponses];
+
+export type monitoringReadServiceReportsData = {
+    body?: never;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+        /**
+         * Service Id
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}/services/{service_id}/reports';
+};
+
+export type monitoringReadServiceReportsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringReadServiceReportsError = monitoringReadServiceReportsErrors[keyof monitoringReadServiceReportsErrors];
+
+export type monitoringReadServiceReportsResponses = {
+    /**
+     * Successful Response
+     */
+    200: CheckReportsPublic;
+};
+
+export type monitoringReadServiceReportsResponse = monitoringReadServiceReportsResponses[keyof monitoringReadServiceReportsResponses];
+
+export type agentsReadAgentsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/agents/';
+};
+
+export type agentsReadAgentsResponses = {
+    /**
+     * Successful Response
+     */
+    200: MonitoringAgentsPublic;
+};
+
+export type agentsReadAgentsResponse = agentsReadAgentsResponses[keyof agentsReadAgentsResponses];
+
+export type agentsCreateAgentData = {
+    body: MonitoringAgentCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/agents/';
+};
+
+export type agentsCreateAgentErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type agentsCreateAgentError = agentsCreateAgentErrors[keyof agentsCreateAgentErrors];
+
+export type agentsCreateAgentResponses = {
+    /**
+     * Successful Response
+     */
+    200: MonitoringAgentPublic;
+};
+
+export type agentsCreateAgentResponse = agentsCreateAgentResponses[keyof agentsCreateAgentResponses];
+
+export type agentsDeleteAgentData = {
+    body?: never;
+    path: {
+        /**
+         * Agent Id
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/api/v1/agents/{agent_id}';
+};
+
+export type agentsDeleteAgentErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type agentsDeleteAgentError = agentsDeleteAgentErrors[keyof agentsDeleteAgentErrors];
+
+export type agentsDeleteAgentResponses = {
+    /**
+     * Successful Response
+     */
+    200: Message;
+};
+
+export type agentsDeleteAgentResponse = agentsDeleteAgentResponses[keyof agentsDeleteAgentResponses];
+
+export type agentsUpdateAgentData = {
+    body: MonitoringAgentUpdate;
+    path: {
+        /**
+         * Agent Id
+         */
+        agent_id: string;
+    };
+    query?: never;
+    url: '/api/v1/agents/{agent_id}';
+};
+
+export type agentsUpdateAgentErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type agentsUpdateAgentError = agentsUpdateAgentErrors[keyof agentsUpdateAgentErrors];
+
+export type agentsUpdateAgentResponses = {
+    /**
+     * Successful Response
+     */
+    200: MonitoringAgentPublic;
+};
+
+export type agentsUpdateAgentResponse = agentsUpdateAgentResponses[keyof agentsUpdateAgentResponses];
+
+export type agentsReadAgentTasksData = {
+    body?: never;
+    headers: {
+        /**
+         * X-Agent-Token
+         */
+        'X-Agent-Token': string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/agents/tasks';
+};
+
+export type agentsReadAgentTasksErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type agentsReadAgentTasksError = agentsReadAgentTasksErrors[keyof agentsReadAgentTasksErrors];
+
+export type agentsReadAgentTasksResponses = {
+    /**
+     * Successful Response
+     */
+    200: AgentTasksPublic;
+};
+
+export type agentsReadAgentTasksResponse = agentsReadAgentTasksResponses[keyof agentsReadAgentTasksResponses];
+
+export type agentsCreateReportsData = {
+    /**
+     * Reports
+     */
+    body: Array<AgentReportCreate>;
+    headers: {
+        /**
+         * X-Agent-Token
+         */
+        'X-Agent-Token': string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/agents/reports';
+};
+
+export type agentsCreateReportsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type agentsCreateReportsError = agentsCreateReportsErrors[keyof agentsCreateReportsErrors];
+
+export type agentsCreateReportsResponses = {
+    /**
+     * Successful Response
+     */
+    200: Message;
+};
+
+export type agentsCreateReportsResponse = agentsCreateReportsResponses[keyof agentsCreateReportsResponses];
 
 export type privateCreateUserData = {
     body: PrivateUserCreate;

@@ -5,6 +5,7 @@ import { MonitoringService, type ResourceGroupPublic } from "@/client"
 import { Button } from "@/components/ui/button"
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
+import { AvailabilityDots } from "./AvailabilityDots"
 import { GroupDialog } from "./GroupDialog"
 import { ServiceDialog } from "./ServiceDialog"
 
@@ -101,6 +102,9 @@ export function ResourceGroupCard({ group }: { group: ResourceGroupPublic }) {
                       {service.note}
                     </p>
                   )}
+                  <div className="mt-2">
+                    <AvailabilityDots groupId={group.id} service={service} />
+                  </div>
                 </div>
                 <div className="flex shrink-0">
                   <ServiceDialog groupId={group.id} service={service} />

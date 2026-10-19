@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Pencil, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
+import { agentsQuery } from "./AgentsPanel"
 
 const schema = z.object({
   name: z.string().min(1, "Укажите название"),
@@ -51,8 +52,12 @@ const schema = z.object({
     "Порты указываются через запятую: от 1 до 65535",
   ),
   check_method: z.enum(["tcp", "http"]),
+  http_method: z.enum(["GET", "POST", "HEAD"]),
+  http_path: z.string().min(1, "Укажите путь"),
+  expected_status: z.number().int().min(100).max(599),
   check_interval_seconds: z.number().int().min(10).max(86400),
   note: z.string().optional(),
+  agent_id: z.string(),
 })
 
 type FormData = z.infer<typeof schema>
@@ -74,8 +79,12 @@ export function ServiceDialog({
       address: "",
       ports: "",
       check_method: "tcp",
+      http_method: "GET",
+      http_path: "/",
+      expected_status: 200,
       check_interval_seconds: 60,
       note: "",
+      agent_id: "",
     },
   })
 
@@ -87,11 +96,16 @@ export function ServiceDialog({
         address: service?.address ?? "",
         ports: service?.ports?.join(", ") ?? "",
         check_method: service?.check_method ?? "tcp",
+        http_method: service?.http_method ?? "GET",
+        http_path: service?.http_path ?? "/",
+        expected_status: service?.expected_status ?? 200,
         check_interval_seconds: service?.check_interval_seconds ?? 60,
         note: service?.note ?? "",
+        agent_id: service?.agent_id ?? "",
       })
     }
   }, [form, open, service])
+  const { data: agents } = useQuery(agentsQuery)
 
   const mutation = useMutation({
     mutationFn: (data: FormData) => {
@@ -103,6 +117,7 @@ export function ServiceDialog({
           .map((port) => Number(port.trim()))
           .filter(Boolean),
         note: data.note || null,
+        agent_id: data.agent_id || null,
       }
       return service
         ? MonitoringService.updateService({
@@ -190,6 +205,30 @@ export function ServiceDialog({
               />
               <FormField
                 control={form.control}
+                name="agent_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Агент</FormLabel>
+                    <FormControl>
+                      <select
+                        className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                        {...field}
+                      >
+                        <option value="">Не назначен</option>
+                        {agents?.data.map((agent) => (
+                          <option key={agent.id} value={agent.id}>
+                            {agent.name}
+                            {agent.location ? ` — ${agent.location}` : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="check_interval_seconds"
                 render={({ field }) => (
                   <FormItem>
@@ -222,6 +261,60 @@ export function ServiceDialog({
                         <option value="tcp">TCP</option>
                         <option value="http">HTTP</option>
                       </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="http_method"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>HTTP метод</FormLabel>
+                    <FormControl>
+                      <select
+                        className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                        {...field}
+                      >
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="HEAD">HEAD</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="http_path"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>HTTP путь</FormLabel>
+                    <FormControl>
+                      <Input placeholder="/health" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="expected_status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ожидаемый HTTP код</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="100"
+                        max="599"
+                        {...field}
+                        onChange={(event) =>
+                          field.onChange(event.currentTarget.valueAsNumber)
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

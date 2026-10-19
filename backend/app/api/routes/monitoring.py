@@ -6,12 +6,16 @@ from sqlmodel import col, func, select
 
 from app.api.deps import CurrentUser, SessionDep
 from app.models import (
+    CheckReport,
+    CheckReportPublic,
+    CheckReportsPublic,
     Message,
     MonitoredService,
     MonitoredServiceCreate,
     MonitoredServicePublic,
     MonitoredServicesPublic,
     MonitoredServiceUpdate,
+    MonitoringAgent,
     ResourceGroup,
     ResourceGroupCreate,
     ResourceGroupPublic,
@@ -39,11 +43,24 @@ def group_public(session: SessionDep, group: ResourceGroup) -> ResourceGroupPubl
     # Счётчик позволяет показывать состав группы без загрузки всех сервисов.
 
     count = session.exec(
-        select(func.count()).select_from(MonitoredService).where(
-            MonitoredService.resource_group_id == group.id
-        )
+        select(func.count())
+        .select_from(MonitoredService)
+        .where(MonitoredService.resource_group_id == group.id)
     ).one()
     return ResourceGroupPublic.model_validate(group, update={"services_count": count})
+
+
+def check_agent_access(
+    session: SessionDep, current_user: CurrentUser, agent_id: uuid.UUID | None
+) -> None:
+    """Не даёт привязать сервис к чужому агенту."""
+    if agent_id is None:
+        return
+    agent = session.get(MonitoringAgent, agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Monitoring agent not found")
+    if not current_user.is_superuser and agent.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
 
 
 @router.get("/", response_model=ResourceGroupsPublic)
@@ -51,9 +68,7 @@ def read_resource_groups(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
 
-    statement = select(ResourceGroup).order_by(
-        col(ResourceGroup.created_at).desc()
-    )
+    statement = select(ResourceGroup).order_by(col(ResourceGroup.created_at).desc())
 
     if not current_user.is_superuser:
         # Администратор видит все группы, остальные — только свои.
@@ -140,6 +155,7 @@ def create_service(
 ) -> MonitoredService:
 
     get_group_or_404(session, current_user, group_id)
+    check_agent_access(session, current_user, service_in.agent_id)
 
     # Идентификатор группы берём из URL, а не из тела запроса.
     service = MonitoredService.model_validate(
@@ -163,12 +179,14 @@ def update_service(
 
     get_group_or_404(session, current_user, group_id)
 
-
     service = session.get(MonitoredService, service_id)
     if not service or service.resource_group_id != group_id:
         raise HTTPException(status_code=404, detail="Monitored service not found")
 
-    service.sqlmodel_update(service_in.model_dump(exclude_unset=True))
+    changes = service_in.model_dump(exclude_unset=True)
+    if "agent_id" in changes:
+        check_agent_access(session, current_user, changes["agent_id"])
+    service.sqlmodel_update(changes)
     session.add(service)
     session.commit()
     session.refresh(service)
@@ -192,3 +210,27 @@ def delete_service(
     session.delete(service)
     session.commit()
     return Message(message="Monitored service deleted")
+
+
+@router.get(
+    "/{group_id}/services/{service_id}/reports", response_model=CheckReportsPublic
+)
+def read_service_reports(
+    session: SessionDep,
+    current_user: CurrentUser,
+    group_id: uuid.UUID,
+    service_id: uuid.UUID,
+) -> CheckReportsPublic:
+    get_group_or_404(session, current_user, group_id)
+    service = session.get(MonitoredService, service_id)
+    if not service or service.resource_group_id != group_id:
+        raise HTTPException(status_code=404, detail="Monitored service not found")
+    reports = session.exec(
+        select(CheckReport)
+        .where(CheckReport.service_id == service_id)
+        .order_by(col(CheckReport.checked_at).desc())
+        .limit(40)
+    ).all()
+    return CheckReportsPublic(
+        data=[CheckReportPublic.model_validate(report) for report in reports]
+    )

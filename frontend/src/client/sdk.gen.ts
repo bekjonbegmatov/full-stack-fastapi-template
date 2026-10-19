@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { itemsCreateItemData, itemsCreateItemErrors, itemsCreateItemResponses, itemsDeleteItemData, itemsDeleteItemErrors, itemsDeleteItemResponses, itemsReadItemData, itemsReadItemErrors, itemsReadItemResponses, itemsReadItemsData, itemsReadItemsErrors, itemsReadItemsResponses, itemsUpdateItemData, itemsUpdateItemErrors, itemsUpdateItemResponses, loginLoginAccessTokenData, loginLoginAccessTokenErrors, loginLoginAccessTokenResponses, loginRecoverPasswordData, loginRecoverPasswordErrors, loginRecoverPasswordHtmlContentData, loginRecoverPasswordHtmlContentErrors, loginRecoverPasswordHtmlContentResponses, loginRecoverPasswordResponses, loginResetPasswordData, loginResetPasswordErrors, loginResetPasswordResponses, loginTestTokenData, loginTestTokenResponses, monitoringCreateResourceGroupData, monitoringCreateResourceGroupErrors, monitoringCreateResourceGroupResponses, monitoringCreateServiceData, monitoringCreateServiceErrors, monitoringCreateServiceResponses, monitoringDeleteResourceGroupData, monitoringDeleteResourceGroupErrors, monitoringDeleteResourceGroupResponses, monitoringDeleteServiceData, monitoringDeleteServiceErrors, monitoringDeleteServiceResponses, monitoringReadResourceGroupData, monitoringReadResourceGroupErrors, monitoringReadResourceGroupResponses, monitoringReadResourceGroupsData, monitoringReadResourceGroupsErrors, monitoringReadResourceGroupsResponses, monitoringReadServicesData, monitoringReadServicesErrors, monitoringReadServicesResponses, monitoringUpdateResourceGroupData, monitoringUpdateResourceGroupErrors, monitoringUpdateResourceGroupResponses, monitoringUpdateServiceData, monitoringUpdateServiceErrors, monitoringUpdateServiceResponses, privateCreateUserData, privateCreateUserErrors, privateCreateUserResponses, usersCreateUserData, usersCreateUserErrors, usersCreateUserResponses, usersDeleteUserData, usersDeleteUserErrors, usersDeleteUserMeData, usersDeleteUserMeResponses, usersDeleteUserResponses, usersReadUserByIdData, usersReadUserByIdErrors, usersReadUserByIdResponses, usersReadUserMeData, usersReadUserMeResponses, usersReadUsersData, usersReadUsersErrors, usersReadUsersResponses, usersRegisterUserData, usersRegisterUserErrors, usersRegisterUserResponses, usersUpdatePasswordMeData, usersUpdatePasswordMeErrors, usersUpdatePasswordMeResponses, usersUpdateUserData, usersUpdateUserErrors, usersUpdateUserMeData, usersUpdateUserMeErrors, usersUpdateUserMeResponses, usersUpdateUserResponses, utilsHealthCheckData, utilsHealthCheckResponses, utilsTestEmailData, utilsTestEmailErrors, utilsTestEmailResponses } from './types.gen';
+import type { agentsCreateAgentData, agentsCreateAgentErrors, agentsCreateAgentResponses, agentsCreateReportsData, agentsCreateReportsErrors, agentsCreateReportsResponses, agentsDeleteAgentData, agentsDeleteAgentErrors, agentsDeleteAgentResponses, agentsReadAgentsData, agentsReadAgentsResponses, agentsReadAgentTasksData, agentsReadAgentTasksErrors, agentsReadAgentTasksResponses, agentsUpdateAgentData, agentsUpdateAgentErrors, agentsUpdateAgentResponses, itemsCreateItemData, itemsCreateItemErrors, itemsCreateItemResponses, itemsDeleteItemData, itemsDeleteItemErrors, itemsDeleteItemResponses, itemsReadItemData, itemsReadItemErrors, itemsReadItemResponses, itemsReadItemsData, itemsReadItemsErrors, itemsReadItemsResponses, itemsUpdateItemData, itemsUpdateItemErrors, itemsUpdateItemResponses, loginLoginAccessTokenData, loginLoginAccessTokenErrors, loginLoginAccessTokenResponses, loginRecoverPasswordData, loginRecoverPasswordErrors, loginRecoverPasswordHtmlContentData, loginRecoverPasswordHtmlContentErrors, loginRecoverPasswordHtmlContentResponses, loginRecoverPasswordResponses, loginResetPasswordData, loginResetPasswordErrors, loginResetPasswordResponses, loginTestTokenData, loginTestTokenResponses, monitoringCreateResourceGroupData, monitoringCreateResourceGroupErrors, monitoringCreateResourceGroupResponses, monitoringCreateServiceData, monitoringCreateServiceErrors, monitoringCreateServiceResponses, monitoringDeleteResourceGroupData, monitoringDeleteResourceGroupErrors, monitoringDeleteResourceGroupResponses, monitoringDeleteServiceData, monitoringDeleteServiceErrors, monitoringDeleteServiceResponses, monitoringReadResourceGroupData, monitoringReadResourceGroupErrors, monitoringReadResourceGroupResponses, monitoringReadResourceGroupsData, monitoringReadResourceGroupsErrors, monitoringReadResourceGroupsResponses, monitoringReadServiceReportsData, monitoringReadServiceReportsErrors, monitoringReadServiceReportsResponses, monitoringReadServicesData, monitoringReadServicesErrors, monitoringReadServicesResponses, monitoringUpdateResourceGroupData, monitoringUpdateResourceGroupErrors, monitoringUpdateResourceGroupResponses, monitoringUpdateServiceData, monitoringUpdateServiceErrors, monitoringUpdateServiceResponses, privateCreateUserData, privateCreateUserErrors, privateCreateUserResponses, usersCreateUserData, usersCreateUserErrors, usersCreateUserResponses, usersDeleteUserData, usersDeleteUserErrors, usersDeleteUserMeData, usersDeleteUserMeResponses, usersDeleteUserResponses, usersReadUserByIdData, usersReadUserByIdErrors, usersReadUserByIdResponses, usersReadUserMeData, usersReadUserMeResponses, usersReadUsersData, usersReadUsersErrors, usersReadUsersResponses, usersRegisterUserData, usersRegisterUserErrors, usersRegisterUserResponses, usersUpdatePasswordMeData, usersUpdatePasswordMeErrors, usersUpdatePasswordMeResponses, usersUpdateUserData, usersUpdateUserErrors, usersUpdateUserMeData, usersUpdateUserMeErrors, usersUpdateUserMeResponses, usersUpdateUserResponses, utilsHealthCheckData, utilsHealthCheckResponses, utilsTestEmailData, utilsTestEmailErrors, utilsTestEmailResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -481,6 +481,102 @@ export class MonitoringService {
             responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/v1/resource-groups/{group_id}/services/{service_id}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+
+    /**
+     * Read Service Reports
+     */
+    public static readServiceReports<ThrowOnError extends boolean = true>(options: Options<monitoringReadServiceReportsData, ThrowOnError>) {
+        return (options.client ?? client).get<monitoringReadServiceReportsResponses, monitoringReadServiceReportsErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/resource-groups/{group_id}/services/{service_id}/reports',
+            ...options
+        });
+    }
+}
+
+export class AgentsService {
+    /**
+     * Read Agents
+     */
+    public static readAgents<ThrowOnError extends boolean = true>(options?: Options<agentsReadAgentsData, ThrowOnError>) {
+        return (options?.client ?? client).get<agentsReadAgentsResponses, unknown, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/agents/',
+            ...options
+        });
+    }
+
+    /**
+     * Create Agent
+     */
+    public static createAgent<ThrowOnError extends boolean = true>(options: Options<agentsCreateAgentData, ThrowOnError>) {
+        return (options.client ?? client).post<agentsCreateAgentResponses, agentsCreateAgentErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/agents/',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+
+    /**
+     * Delete Agent
+     */
+    public static deleteAgent<ThrowOnError extends boolean = true>(options: Options<agentsDeleteAgentData, ThrowOnError>) {
+        return (options.client ?? client).delete<agentsDeleteAgentResponses, agentsDeleteAgentErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/agents/{agent_id}',
+            ...options
+        });
+    }
+
+    /**
+     * Update Agent
+     */
+    public static updateAgent<ThrowOnError extends boolean = true>(options: Options<agentsUpdateAgentData, ThrowOnError>) {
+        return (options.client ?? client).put<agentsUpdateAgentResponses, agentsUpdateAgentErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/api/v1/agents/{agent_id}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+
+    /**
+     * Read Agent Tasks
+     */
+    public static readAgentTasks<ThrowOnError extends boolean = true>(options: Options<agentsReadAgentTasksData, ThrowOnError>) {
+        return (options.client ?? client).get<agentsReadAgentTasksResponses, agentsReadAgentTasksErrors, ThrowOnError>({
+            responseType: 'json',
+            url: '/api/v1/agents/tasks',
+            ...options
+        });
+    }
+
+    /**
+     * Create Reports
+     */
+    public static createReports<ThrowOnError extends boolean = true>(options: Options<agentsCreateReportsData, ThrowOnError>) {
+        return (options.client ?? client).post<agentsCreateReportsResponses, agentsCreateReportsErrors, ThrowOnError>({
+            responseType: 'json',
+            url: '/api/v1/agents/reports',
             ...options,
             headers: {
                 'Content-Type': 'application/json',

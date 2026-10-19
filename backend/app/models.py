@@ -167,11 +167,26 @@ class CheckMethod(StrEnum):
     http = "http"
 
 
+class HttpMethod(StrEnum):
+    GET = "GET"
+    POST = "POST"
+    HEAD = "HEAD"
+
+
+class CheckStatus(StrEnum):
+    up = "up"
+    down = "down"
+    error = "error"
+
+
 class MonitoredServiceBase(SQLModel):
     name: str = Field(min_length=1, max_length=255)
     address: str = Field(min_length=1, max_length=255)
     ports: list[int] = Field(default_factory=list, sa_type=ARRAY(Integer))
     check_method: CheckMethod = CheckMethod.tcp
+    http_method: HttpMethod = HttpMethod.GET
+    http_path: str = Field(default="/", max_length=500)
+    expected_status: int = Field(default=200, ge=100, le=599)
     check_interval_seconds: int = Field(default=60, ge=10, le=86400)
     note: str | None = Field(default=None, max_length=1000)
 
@@ -186,7 +201,7 @@ class MonitoredServiceBase(SQLModel):
 
 
 class MonitoredServiceCreate(MonitoredServiceBase):
-    pass
+    agent_id: uuid.UUID | None = None
 
 
 class MonitoredServiceUpdate(SQLModel):
@@ -194,8 +209,12 @@ class MonitoredServiceUpdate(SQLModel):
     address: str | None = Field(default=None, min_length=1, max_length=255)
     ports: list[int] | None = None
     check_method: CheckMethod | None = None
+    http_method: HttpMethod | None = None
+    http_path: str | None = Field(default=None, max_length=500)
+    expected_status: int | None = Field(default=None, ge=100, le=599)
     check_interval_seconds: int | None = Field(default=None, ge=10, le=86400)
     note: str | None = Field(default=None, max_length=1000)
+    agent_id: uuid.UUID | None = None
 
     @field_validator("ports")
     @classmethod
@@ -220,6 +239,9 @@ class MonitoredService(MonitoredServiceBase, table=True):
     resource_group_id: uuid.UUID = Field(
         foreign_key="resource_group.id", nullable=False, ondelete="CASCADE"
     )
+    agent_id: uuid.UUID | None = Field(
+        default=None, foreign_key="monitoring_agent.id", ondelete="SET NULL"
+    )
     resource_group: ResourceGroup | None = Relationship(back_populates="services")
 
 
@@ -227,11 +249,114 @@ class MonitoredServicePublic(MonitoredServiceBase):
     id: uuid.UUID
     resource_group_id: uuid.UUID
     created_at: datetime | None = None
+    agent_id: uuid.UUID | None = None
 
 
 class MonitoredServicesPublic(SQLModel):
     data: list[MonitoredServicePublic]
     count: int
+
+
+# Агент сам подключается к серверу, поэтому его IP хранить не нужно.
+class MonitoringAgentBase(SQLModel):
+    name: str = Field(min_length=1, max_length=255)
+    location: str | None = Field(default=None, max_length=255)
+
+
+class MonitoringAgentCreate(MonitoringAgentBase):
+    pass
+
+
+class MonitoringAgentUpdate(SQLModel):
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+    location: str | None = Field(default=None, max_length=255)
+
+
+class MonitoringAgent(MonitoringAgentBase, table=True):
+    __tablename__ = "monitoring_agent"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    token: str = Field(unique=True, index=True, min_length=120, max_length=120)
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+    )
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    last_seen_at: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))  # type: ignore
+
+
+class MonitoringAgentPublic(MonitoringAgentBase):
+    id: uuid.UUID
+    token: str
+    owner_id: uuid.UUID
+    created_at: datetime | None = None
+    last_seen_at: datetime | None = None
+
+
+class MonitoringAgentsPublic(SQLModel):
+    data: list[MonitoringAgentPublic]
+    count: int
+
+
+# Задание получает только агент; оно не раскрывает данные других групп.
+class AgentTask(SQLModel):
+    id: uuid.UUID
+    name: str
+    address: str
+    ports: list[int]
+    check_method: CheckMethod
+    http_method: HttpMethod
+    http_path: str
+    expected_status: int
+    check_interval_seconds: int
+
+
+class AgentTasksPublic(SQLModel):
+    data: list[AgentTask]
+
+
+class AgentReportCreate(SQLModel):
+    service_id: uuid.UUID
+    port: int | None = Field(default=None, ge=1, le=65535)
+    status: CheckStatus
+    latency_ms: int | None = Field(default=None, ge=0)
+    detail: str | None = Field(default=None, max_length=1000)
+    checked_at: datetime = Field(default_factory=get_datetime_utc)
+
+
+class CheckReport(SQLModel, table=True):
+    __tablename__ = "check_report"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    agent_id: uuid.UUID = Field(
+        foreign_key="monitoring_agent.id", nullable=False, ondelete="CASCADE"
+    )
+    service_id: uuid.UUID = Field(
+        foreign_key="monitored_service.id", nullable=False, ondelete="CASCADE"
+    )
+    port: int | None = None
+    status: CheckStatus
+    latency_ms: int | None = None
+    detail: str | None = Field(default=None, max_length=1000)
+    checked_at: datetime = Field(
+        default_factory=get_datetime_utc, sa_type=DateTime(timezone=True)
+    )  # type: ignore
+
+
+class CheckReportPublic(SQLModel):
+    id: uuid.UUID
+    service_id: uuid.UUID
+    port: int | None = None
+    status: CheckStatus
+    latency_ms: int | None = None
+    detail: str | None = None
+    checked_at: datetime
+
+
+class CheckReportsPublic(SQLModel):
+    data: list[CheckReportPublic]
 
 
 # Generic message
