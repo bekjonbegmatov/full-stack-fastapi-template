@@ -1,8 +1,8 @@
 import uuid
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import col, func, select
 
 from app.api.deps import CurrentUser, SessionDep
@@ -10,6 +10,8 @@ from app.models import (
     CheckReport,
     CheckReportPublic,
     CheckReportsPublic,
+    CheckStatus,
+    HistoryPoint,
     Message,
     MonitoredService,
     MonitoredServiceCreate,
@@ -23,6 +25,7 @@ from app.models import (
     ResourceGroupsPublic,
     ResourceGroupUpdate,
     ServiceAgent,
+    ServiceHistoryPublic,
     ServiceStatsPublic,
 )
 
@@ -265,19 +268,36 @@ def read_service_reports(
     current_user: CurrentUser,
     group_id: uuid.UUID,
     service_id: uuid.UUID,
+    skip: int = 0,
+    limit: int = 25,
+    hours: int = 12,
+    status: CheckStatus | None = None,
+    agent_id: uuid.UUID | None = None,
 ) -> CheckReportsPublic:
+    """Журнал проверок с фильтрами для страницы сервиса."""
     get_group_or_404(session, current_user, group_id)
     service = session.get(MonitoredService, service_id)
     if not service or service.resource_group_id != group_id:
         raise HTTPException(status_code=404, detail="Monitored service not found")
+    hours = min(max(hours, 1), 24 * 30)
+    statement = select(CheckReport).where(
+        CheckReport.service_id == service_id,
+        CheckReport.checked_at >= datetime.now(UTC) - timedelta(hours=hours),
+    )
+    if status:
+        statement = statement.where(CheckReport.status == status)
+    if agent_id:
+        statement = statement.where(CheckReport.agent_id == agent_id)
+
     reports = session.exec(
-        select(CheckReport)
-        .where(CheckReport.service_id == service_id)
-        .order_by(col(CheckReport.checked_at).desc())
-        .limit(40)
+        statement.order_by(col(CheckReport.checked_at).desc())
+        .offset(skip)
+        .limit(min(max(limit, 1), 100))
     ).all()
+    count = session.exec(select(func.count()).select_from(statement.subquery())).one()
     return CheckReportsPublic(
-        data=[CheckReportPublic.model_validate(report) for report in reports]
+        data=[CheckReportPublic.model_validate(report) for report in reports],
+        count=count,
     )
 
 
@@ -313,7 +333,9 @@ def read_service_stats(
     ]
 
     latencies = [
-        report.latency_ms for report in reports_24h if report.latency_ms is not None
+        report.latency_ms
+        for report in reports_24h
+        if report.status == CheckStatus.up and report.latency_ms is not None
     ]
 
     def uptime_percent(items: list[CheckReport]) -> float | None:
@@ -332,11 +354,85 @@ def read_service_stats(
     )
 
     return ServiceStatsPublic(
-        current_latency_ms=last_report.latency_ms if last_report else None,
+        current_latency_ms=last_report.latency_ms
+        if last_report and last_report.status == CheckStatus.up
+        else None,
         average_latency_24h_ms=round(sum(latencies) / len(latencies))
         if latencies
         else None,
         uptime_24h_percent=uptime_percent(reports_24h),
         uptime_30d_percent=uptime_percent(reports_30d),
         certificate_expires_at=certificate_date,
+    )
+
+
+@router.get("/{group_id}/services/{service_id}/history")
+def read_service_history(
+    session: SessionDep,
+    current_user: CurrentUser,
+    group_id: uuid.UUID,
+    service_id: uuid.UUID,
+    hours: Annotated[int, Query(ge=1, le=720)] = 12,
+) -> ServiceHistoryPublic:
+    get_group_or_404(session, current_user, group_id)
+    service = session.get(MonitoredService, service_id)
+    if not service or service.resource_group_id != group_id:
+        raise HTTPException(status_code=404, detail="Monitored service not found")
+
+    end = datetime.now(UTC)
+    start = end - timedelta(hours=hours)
+    # Весь период делим на интервалы: длинная история не перегружает браузер.
+    bucket_seconds = max(service.check_interval_seconds, hours * 3600 // 120)
+    bucket = func.floor(func.extract("epoch", CheckReport.checked_at) / bucket_seconds)
+    rows = session.exec(
+        select(
+            CheckReport.agent_id,
+            CheckReport.port,
+            bucket,
+            func.avg(CheckReport.latency_ms).filter(
+                CheckReport.status == CheckStatus.up
+            ),
+            func.count().filter(CheckReport.status == CheckStatus.up),
+            func.count().filter(CheckReport.status != CheckStatus.up),
+        )
+        .where(
+            CheckReport.service_id == service_id,
+            CheckReport.checked_at >= start,
+            CheckReport.checked_at <= end,
+        )
+        .group_by(CheckReport.agent_id, CheckReport.port, bucket)
+        .order_by(bucket)
+    ).all()
+
+    # Текущий статус каждого порта не зависит от выбранного периода графика.
+    latest = session.exec(
+        select(CheckReport)
+        .where(CheckReport.service_id == service_id)
+        .distinct(CheckReport.agent_id, CheckReport.port)
+        .order_by(
+            CheckReport.agent_id,
+            CheckReport.port,
+            col(CheckReport.checked_at).desc(),
+            CheckReport.id,
+        )
+    ).all()
+
+    return ServiceHistoryPublic(
+        points=[
+            HistoryPoint(
+                agent_id=agent_id,
+                port=port,
+                checked_at=max(
+                    start, datetime.fromtimestamp(float(slot) * bucket_seconds, UTC)
+                ),
+                latency_ms=float(latency) if latency is not None else None,
+                up_count=up,
+                down_count=down,
+            )
+            for agent_id, port, slot, latency, up, down in rows
+        ],
+        latest=[CheckReportPublic.model_validate(report) for report in latest],
+        start=start,
+        end=end,
+        bucket_seconds=bucket_seconds,
     )

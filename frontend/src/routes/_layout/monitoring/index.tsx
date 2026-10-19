@@ -4,7 +4,6 @@ import { Activity } from "lucide-react"
 import { Suspense } from "react"
 
 import { MonitoringService } from "@/client"
-import { AgentsPanel } from "@/components/Monitoring/AgentsPanel"
 import { GroupDialog } from "@/components/Monitoring/GroupDialog"
 import { ResourceGroupCard } from "@/components/Monitoring/ResourceGroupCard"
 
@@ -53,7 +52,6 @@ function MonitoringHome() {
         </div>
         <GroupDialog />
       </div>
-      <AgentsPanel />
       <Suspense
         fallback={<p className="text-muted-foreground">Загрузка групп…</p>}
       >

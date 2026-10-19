@@ -163,6 +163,10 @@ export type CheckReportsPublic = {
      * Data
      */
     data: Array<CheckReportPublic>;
+    /**
+     * Count
+     */
+    count: number;
 };
 
 /**
@@ -178,6 +182,36 @@ export type HTTPValidationError = {
      * Detail
      */
     detail?: Array<ValidationError>;
+};
+
+/**
+ * HistoryPoint
+ */
+export type HistoryPoint = {
+    /**
+     * Agent Id
+     */
+    agent_id: string;
+    /**
+     * Port
+     */
+    port: number | null;
+    /**
+     * Checked At
+     */
+    checked_at: string;
+    /**
+     * Latency Ms
+     */
+    latency_ms: number | null;
+    /**
+     * Up Count
+     */
+    up_count: number;
+    /**
+     * Down Count
+     */
+    down_count: number;
 };
 
 /**
@@ -421,6 +455,10 @@ export type MonitoringAgentCreate = {
      * Location
      */
     location?: string | null;
+    /**
+     * Country
+     */
+    country?: string | null;
 };
 
 /**
@@ -435,6 +473,10 @@ export type MonitoringAgentPublic = {
      * Location
      */
     location?: string | null;
+    /**
+     * Country
+     */
+    country?: string | null;
     /**
      * Id
      */
@@ -469,6 +511,10 @@ export type MonitoringAgentUpdate = {
      * Location
      */
     location?: string | null;
+    /**
+     * Country
+     */
+    country?: string | null;
 };
 
 /**
@@ -591,6 +637,32 @@ export type ResourceGroupsPublic = {
      * Count
      */
     count: number;
+};
+
+/**
+ * ServiceHistoryPublic
+ */
+export type ServiceHistoryPublic = {
+    /**
+     * Points
+     */
+    points: Array<HistoryPoint>;
+    /**
+     * Latest
+     */
+    latest: Array<CheckReportPublic>;
+    /**
+     * Start
+     */
+    start: string;
+    /**
+     * End
+     */
+    end: string;
+    /**
+     * Bucket Seconds
+     */
+    bucket_seconds: number;
 };
 
 /**
@@ -1671,7 +1743,28 @@ export type monitoringReadServiceReportsData = {
          */
         service_id: string;
     };
-    query?: never;
+    query?: {
+        /**
+         * Skip
+         */
+        skip?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Hours
+         */
+        hours?: number;
+        /**
+         * Status
+         */
+        status?: CheckStatus | null;
+        /**
+         * Agent Id
+         */
+        agent_id?: string | null;
+    };
     url: '/api/v1/resource-groups/{group_id}/services/{service_id}/reports';
 };
 
@@ -1726,6 +1819,45 @@ export type monitoringReadServiceStatsResponses = {
 };
 
 export type monitoringReadServiceStatsResponse = monitoringReadServiceStatsResponses[keyof monitoringReadServiceStatsResponses];
+
+export type monitoringReadServiceHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+        /**
+         * Service Id
+         */
+        service_id: string;
+    };
+    query?: {
+        /**
+         * Hours
+         */
+        hours?: number;
+    };
+    url: '/api/v1/resource-groups/{group_id}/services/{service_id}/history';
+};
+
+export type monitoringReadServiceHistoryErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringReadServiceHistoryError = monitoringReadServiceHistoryErrors[keyof monitoringReadServiceHistoryErrors];
+
+export type monitoringReadServiceHistoryResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServiceHistoryPublic;
+};
+
+export type monitoringReadServiceHistoryResponse = monitoringReadServiceHistoryResponses[keyof monitoringReadServiceHistoryResponses];
 
 export type agentsReadAgentsData = {
     body?: never;

@@ -3,6 +3,7 @@ import { createFileRoute, Link, Outlet } from "@tanstack/react-router"
 import { ChevronLeft, Server } from "lucide-react"
 
 import { MonitoringService } from "@/client"
+import { GroupDialog } from "@/components/Monitoring/GroupDialog"
 import { ServiceDialog } from "@/components/Monitoring/ServiceDialog"
 import { Button } from "@/components/ui/button"
 
@@ -43,14 +44,17 @@ function GroupPage() {
             <ChevronLeft />К группам
           </Link>
         </Button>
-        <h1 className="text-2xl font-bold">{group.data.name}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{group.data.name}</h1>
+          <GroupDialog group={group.data} />
+        </div>
         {group.data.description && (
           <p className="mt-1 text-muted-foreground">{group.data.description}</p>
         )}
       </div>
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="h-fit rounded-xl border bg-card p-3">
-          <div className="mb-3 flex items-center justify-between px-2">
+          <div className="mb-3 flex flex-col items-stretch gap-3 px-2">
             <span className="text-sm font-semibold">Сервисы</span>
             <ServiceDialog groupId={groupId} />
           </div>

@@ -279,6 +279,7 @@ class ServiceAgent(SQLModel, table=True):
 class MonitoringAgentBase(SQLModel):
     name: str = Field(min_length=1, max_length=255)
     location: str | None = Field(default=None, max_length=255)
+    country: str | None = Field(default=None, max_length=100)
 
 
 class MonitoringAgentCreate(MonitoringAgentBase):
@@ -288,6 +289,7 @@ class MonitoringAgentCreate(MonitoringAgentBase):
 class MonitoringAgentUpdate(SQLModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     location: str | None = Field(default=None, max_length=255)
+    country: str | None = Field(default=None, max_length=100)
 
 
 class MonitoringAgent(MonitoringAgentBase, table=True):
@@ -382,6 +384,24 @@ class CheckReportPublic(SQLModel):
 
 class CheckReportsPublic(SQLModel):
     data: list[CheckReportPublic]
+    count: int
+
+
+class HistoryPoint(SQLModel):
+    agent_id: uuid.UUID
+    port: int | None
+    checked_at: datetime
+    latency_ms: float | None
+    up_count: int
+    down_count: int
+
+
+class ServiceHistoryPublic(SQLModel):
+    points: list[HistoryPoint]
+    latest: list[CheckReportPublic]
+    start: datetime
+    end: datetime
+    bucket_seconds: int
 
 
 class ServiceStatsPublic(SQLModel):
