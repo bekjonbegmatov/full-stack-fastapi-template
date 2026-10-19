@@ -165,6 +165,7 @@ class ResourceGroupsPublic(SQLModel):
 class CheckMethod(StrEnum):
     tcp = "tcp"
     http = "http"
+    ping = "ping"
 
 
 class HttpMethod(StrEnum):
@@ -201,7 +202,7 @@ class MonitoredServiceBase(SQLModel):
 
 
 class MonitoredServiceCreate(MonitoredServiceBase):
-    agent_id: uuid.UUID | None = None
+    agent_ids: list[uuid.UUID] = Field(default_factory=list, max_length=100)
 
 
 class MonitoredServiceUpdate(SQLModel):
@@ -214,7 +215,7 @@ class MonitoredServiceUpdate(SQLModel):
     expected_status: int | None = Field(default=None, ge=100, le=599)
     check_interval_seconds: int | None = Field(default=None, ge=10, le=86400)
     note: str | None = Field(default=None, max_length=1000)
-    agent_id: uuid.UUID | None = None
+    agent_ids: list[uuid.UUID] | None = Field(default=None, max_length=100)
 
     @field_validator("ports")
     @classmethod
@@ -249,12 +250,29 @@ class MonitoredServicePublic(MonitoredServiceBase):
     id: uuid.UUID
     resource_group_id: uuid.UUID
     created_at: datetime | None = None
-    agent_id: uuid.UUID | None = None
+    agent_ids: list[uuid.UUID] = Field(default_factory=list)
 
 
 class MonitoredServicesPublic(SQLModel):
     data: list[MonitoredServicePublic]
     count: int
+
+
+class ServiceAgent(SQLModel, table=True):
+    """Связь позволяет проверять один сервис с любого числа агентов."""
+
+    __tablename__ = "service_agent"
+
+    service_id: uuid.UUID = Field(
+        foreign_key="monitored_service.id",
+        primary_key=True,
+        ondelete="CASCADE",
+    )
+    agent_id: uuid.UUID = Field(
+        foreign_key="monitoring_agent.id",
+        primary_key=True,
+        ondelete="CASCADE",
+    )
 
 
 # Агент сам подключается к серверу, поэтому его IP хранить не нужно.
@@ -323,6 +341,7 @@ class AgentReportCreate(SQLModel):
     status: CheckStatus
     latency_ms: int | None = Field(default=None, ge=0)
     detail: str | None = Field(default=None, max_length=1000)
+    certificate_expires_at: datetime | None = None
     checked_at: datetime = Field(default_factory=get_datetime_utc)
 
 
@@ -340,6 +359,10 @@ class CheckReport(SQLModel, table=True):
     status: CheckStatus
     latency_ms: int | None = None
     detail: str | None = Field(default=None, max_length=1000)
+    certificate_expires_at: datetime | None = Field(
+        default=None,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
     checked_at: datetime = Field(
         default_factory=get_datetime_utc, sa_type=DateTime(timezone=True)
     )  # type: ignore
@@ -347,16 +370,26 @@ class CheckReport(SQLModel, table=True):
 
 class CheckReportPublic(SQLModel):
     id: uuid.UUID
+    agent_id: uuid.UUID
     service_id: uuid.UUID
     port: int | None = None
     status: CheckStatus
     latency_ms: int | None = None
     detail: str | None = None
+    certificate_expires_at: datetime | None = None
     checked_at: datetime
 
 
 class CheckReportsPublic(SQLModel):
     data: list[CheckReportPublic]
+
+
+class ServiceStatsPublic(SQLModel):
+    current_latency_ms: int | None = None
+    average_latency_24h_ms: int | None = None
+    uptime_24h_percent: float | None = None
+    uptime_30d_percent: float | None = None
+    certificate_expires_at: datetime | None = None
 
 
 # Generic message

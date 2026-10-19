@@ -19,6 +19,7 @@ from app.models import (
     MonitoringAgentPublic,
     MonitoringAgentsPublic,
     MonitoringAgentUpdate,
+    ServiceAgent,
 )
 
 router = APIRouter(prefix="/agents", tags=["agents"])
@@ -61,7 +62,11 @@ def get_service_for_report(
     """Проверяет, что результат пришёл от назначенного агента."""
     service = session.get(MonitoredService, service_id)
 
-    if not service or service.agent_id != agent.id:
+    if not service:
+        raise HTTPException(status_code=403, detail="Service is not assigned to agent")
+
+    link = session.get(ServiceAgent, (service_id, agent.id))
+    if not link:
         raise HTTPException(
             status_code=403,
             detail="Service is not assigned to agent",
@@ -129,7 +134,9 @@ def read_agent_tasks(session: SessionDep, token: AgentToken) -> AgentTasksPublic
     agent = get_agent_by_token(session, token)
 
     services = session.exec(
-        select(MonitoredService).where(MonitoredService.agent_id == agent.id)
+        select(MonitoredService)
+        .join(ServiceAgent)
+        .where(ServiceAgent.agent_id == agent.id)
     ).all()
 
     return AgentTasksPublic(

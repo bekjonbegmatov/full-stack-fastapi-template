@@ -26,6 +26,10 @@ export type AgentReportCreate = {
      */
     detail?: string | null;
     /**
+     * Certificate Expires At
+     */
+    certificate_expires_at?: string | null;
+    /**
      * Checked At
      */
     checked_at?: string;
@@ -110,7 +114,7 @@ export type Body_login_login_access_token = {
 /**
  * CheckMethod
  */
-export type CheckMethod = 'tcp' | 'http';
+export type CheckMethod = 'tcp' | 'http' | 'ping';
 
 /**
  * CheckReportPublic
@@ -120,6 +124,10 @@ export type CheckReportPublic = {
      * Id
      */
     id: string;
+    /**
+     * Agent Id
+     */
+    agent_id: string;
     /**
      * Service Id
      */
@@ -137,6 +145,10 @@ export type CheckReportPublic = {
      * Detail
      */
     detail?: string | null;
+    /**
+     * Certificate Expires At
+     */
+    certificate_expires_at?: string | null;
     /**
      * Checked At
      */
@@ -286,9 +298,9 @@ export type MonitoredServiceCreate = {
      */
     note?: string | null;
     /**
-     * Agent Id
+     * Agent Ids
      */
-    agent_id?: string | null;
+    agent_ids?: Array<string>;
 };
 
 /**
@@ -338,9 +350,9 @@ export type MonitoredServicePublic = {
      */
     created_at?: string | null;
     /**
-     * Agent Id
+     * Agent Ids
      */
-    agent_id?: string | null;
+    agent_ids?: Array<string>;
 };
 
 /**
@@ -378,9 +390,9 @@ export type MonitoredServiceUpdate = {
      */
     note?: string | null;
     /**
-     * Agent Id
+     * Agent Ids
      */
-    agent_id?: string | null;
+    agent_ids?: Array<string> | null;
 };
 
 /**
@@ -579,6 +591,32 @@ export type ResourceGroupsPublic = {
      * Count
      */
     count: number;
+};
+
+/**
+ * ServiceStatsPublic
+ */
+export type ServiceStatsPublic = {
+    /**
+     * Current Latency Ms
+     */
+    current_latency_ms?: number | null;
+    /**
+     * Average Latency 24H Ms
+     */
+    average_latency_24h_ms?: number | null;
+    /**
+     * Uptime 24H Percent
+     */
+    uptime_24h_percent?: number | null;
+    /**
+     * Uptime 30D Percent
+     */
+    uptime_30d_percent?: number | null;
+    /**
+     * Certificate Expires At
+     */
+    certificate_expires_at?: string | null;
 };
 
 /**
@@ -1654,6 +1692,40 @@ export type monitoringReadServiceReportsResponses = {
 };
 
 export type monitoringReadServiceReportsResponse = monitoringReadServiceReportsResponses[keyof monitoringReadServiceReportsResponses];
+
+export type monitoringReadServiceStatsData = {
+    body?: never;
+    path: {
+        /**
+         * Group Id
+         */
+        group_id: string;
+        /**
+         * Service Id
+         */
+        service_id: string;
+    };
+    query?: never;
+    url: '/api/v1/resource-groups/{group_id}/services/{service_id}/stats';
+};
+
+export type monitoringReadServiceStatsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HTTPValidationError;
+};
+
+export type monitoringReadServiceStatsError = monitoringReadServiceStatsErrors[keyof monitoringReadServiceStatsErrors];
+
+export type monitoringReadServiceStatsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServiceStatsPublic;
+};
+
+export type monitoringReadServiceStatsResponse = monitoringReadServiceStatsResponses[keyof monitoringReadServiceStatsResponses];
 
 export type agentsReadAgentsData = {
     body?: never;

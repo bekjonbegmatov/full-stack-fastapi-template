@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import { Server, Trash2 } from "lucide-react"
 
 import { MonitoringService, type ResourceGroupPublic } from "@/client"
@@ -48,7 +49,13 @@ export function ResourceGroupCard({ group }: { group: ResourceGroupPublic }) {
         <div>
           <div className="flex items-center gap-2">
             <Server className="size-5 text-primary" />
-            <h2 className="text-lg font-semibold">{group.name}</h2>
+            <Link
+              to="/monitoring/$groupId"
+              params={{ groupId: group.id }}
+              className="text-lg font-semibold hover:underline"
+            >
+              {group.name}
+            </Link>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
             {group.description || "Без описания"}
@@ -88,7 +95,13 @@ export function ResourceGroupCard({ group }: { group: ResourceGroupPublic }) {
                 className="flex items-center justify-between gap-3 p-3"
               >
                 <div className="min-w-0">
-                  <p className="font-medium">{service.name}</p>
+                  <Link
+                    to="/monitoring/$groupId/$serviceId"
+                    params={{ groupId: group.id, serviceId: service.id }}
+                    className="font-medium hover:underline"
+                  >
+                    {service.name}
+                  </Link>
                   <p className="truncate text-sm text-muted-foreground">
                     {(service.check_method ?? "tcp").toUpperCase()} ·{" "}
                     {service.address}

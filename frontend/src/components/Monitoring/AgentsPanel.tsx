@@ -43,9 +43,6 @@ export function AgentsPanel() {
         <Cpu className="text-primary" />
         <h2 className="text-lg font-semibold">Агенты</h2>
       </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Агент сам подключается к серверу, поэтому IP и входящий порт не нужны.
-      </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <Input
           className="max-w-xs"

@@ -51,13 +51,13 @@ const schema = z.object({
         ),
     "Порты указываются через запятую: от 1 до 65535",
   ),
-  check_method: z.enum(["tcp", "http"]),
+  check_method: z.enum(["tcp", "http", "ping"]),
   http_method: z.enum(["GET", "POST", "HEAD"]),
   http_path: z.string().min(1, "Укажите путь"),
   expected_status: z.number().int().min(100).max(599),
   check_interval_seconds: z.number().int().min(10).max(86400),
   note: z.string().optional(),
-  agent_id: z.string(),
+  agent_ids: z.array(z.string()).max(100),
 })
 
 type FormData = z.infer<typeof schema>
@@ -84,7 +84,7 @@ export function ServiceDialog({
       expected_status: 200,
       check_interval_seconds: 60,
       note: "",
-      agent_id: "",
+      agent_ids: [],
     },
   })
 
@@ -101,11 +101,12 @@ export function ServiceDialog({
         expected_status: service?.expected_status ?? 200,
         check_interval_seconds: service?.check_interval_seconds ?? 60,
         note: service?.note ?? "",
-        agent_id: service?.agent_id ?? "",
+        agent_ids: service?.agent_ids ?? [],
       })
     }
   }, [form, open, service])
   const { data: agents } = useQuery(agentsQuery)
+  const checkMethod = form.watch("check_method")
 
   const mutation = useMutation({
     mutationFn: (data: FormData) => {
@@ -117,7 +118,7 @@ export function ServiceDialog({
           .map((port) => Number(port.trim()))
           .filter(Boolean),
         note: data.note || null,
-        agent_id: data.agent_id || null,
+        agent_ids: data.agent_ids,
       }
       return service
         ? MonitoringService.updateService({
@@ -190,39 +191,61 @@ export function ServiceDialog({
                   </FormItem>
                 )}
               />
+              {checkMethod !== "ping" && (
+                <FormField
+                  control={form.control}
+                  name="ports"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Порты</FormLabel>
+                      <FormControl>
+                        <Input placeholder="80, 443, 8080" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <FormField
                 control={form.control}
-                name="ports"
+                name="agent_ids"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Порты</FormLabel>
-                    <FormControl>
-                      <Input placeholder="80, 443, 8080" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="agent_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Агент</FormLabel>
-                    <FormControl>
-                      <select
-                        className="h-9 w-full rounded-md border bg-background px-3 text-sm"
-                        {...field}
-                      >
-                        <option value="">Не назначен</option>
-                        {agents?.data.map((agent) => (
-                          <option key={agent.id} value={agent.id}>
-                            {agent.name}
-                            {agent.location ? ` — ${agent.location}` : ""}
-                          </option>
-                        ))}
-                      </select>
-                    </FormControl>
+                  <FormItem className="sm:col-span-2">
+                    <FormLabel>Агенты проверки</FormLabel>
+                    <div className="grid max-h-36 grid-cols-1 gap-2 overflow-y-auto rounded-md border p-3 sm:grid-cols-2">
+                      {agents?.data.map((agent) => {
+                        const selected = field.value.includes(agent.id)
+                        return (
+                          <label
+                            key={agent.id}
+                            className="flex cursor-pointer items-center gap-2 text-sm"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selected}
+                              onChange={() =>
+                                field.onChange(
+                                  selected
+                                    ? field.value.filter(
+                                        (id) => id !== agent.id,
+                                      )
+                                    : [...field.value, agent.id],
+                                )
+                              }
+                            />
+                            <span>
+                              {agent.name}
+                              {agent.location ? ` — ${agent.location}` : ""}
+                            </span>
+                          </label>
+                        )
+                      })}
+                      {!agents?.data.length && (
+                        <p className="text-sm text-muted-foreground">
+                          Сначала добавьте агента.
+                        </p>
+                      )}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -260,45 +283,50 @@ export function ServiceDialog({
                       >
                         <option value="tcp">TCP</option>
                         <option value="http">HTTP</option>
+                        <option value="ping">Ping</option>
                       </select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="http_method"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>HTTP метод</FormLabel>
-                    <FormControl>
-                      <select
-                        className="h-9 w-full rounded-md border bg-background px-3 text-sm"
-                        {...field}
-                      >
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="HEAD">HEAD</option>
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="http_path"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>HTTP путь</FormLabel>
-                    <FormControl>
-                      <Input placeholder="/health" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {checkMethod === "http" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="http_method"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>HTTP метод</FormLabel>
+                        <FormControl>
+                          <select
+                            className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                            {...field}
+                          >
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="HEAD">HEAD</option>
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="http_path"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>HTTP путь</FormLabel>
+                        <FormControl>
+                          <Input placeholder="/health" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
               <FormField
                 control={form.control}
                 name="expected_status"

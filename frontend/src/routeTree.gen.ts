@@ -19,6 +19,10 @@ import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
 import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
 import { Route as LayoutMonitoringRouteImport } from './routes/_layout/monitoring'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
+import { Route as LayoutMonitoringIndexRouteImport } from './routes/_layout/monitoring/index'
+import { Route as LayoutMonitoringGroupIdRouteImport } from './routes/_layout/monitoring/$groupId'
+import { Route as LayoutMonitoringGroupIdIndexRouteImport } from './routes/_layout/monitoring/$groupId/index'
+import { Route as LayoutMonitoringGroupIdServiceIdRouteImport } from './routes/_layout/monitoring/$groupId/$serviceId'
 
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
@@ -69,6 +73,28 @@ const LayoutSettingsRoute = LayoutSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutMonitoringIndexRoute = LayoutMonitoringIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LayoutMonitoringRoute,
+} as any)
+const LayoutMonitoringGroupIdRoute = LayoutMonitoringGroupIdRouteImport.update({
+  id: '/$groupId',
+  path: '/$groupId',
+  getParentRoute: () => LayoutMonitoringRoute,
+} as any)
+const LayoutMonitoringGroupIdIndexRoute =
+  LayoutMonitoringGroupIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LayoutMonitoringGroupIdRoute,
+  } as any)
+const LayoutMonitoringGroupIdServiceIdRoute =
+  LayoutMonitoringGroupIdServiceIdRouteImport.update({
+    id: '/$serviceId',
+    path: '/$serviceId',
+    getParentRoute: () => LayoutMonitoringGroupIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute
@@ -78,8 +104,12 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
   '/items': typeof LayoutItemsRoute
-  '/monitoring': typeof LayoutMonitoringRoute
+  '/monitoring': typeof LayoutMonitoringRouteWithChildren
   '/settings': typeof LayoutSettingsRoute
+  '/monitoring/$groupId': typeof LayoutMonitoringGroupIdRouteWithChildren
+  '/monitoring/': typeof LayoutMonitoringIndexRoute
+  '/monitoring/$groupId/$serviceId': typeof LayoutMonitoringGroupIdServiceIdRoute
+  '/monitoring/$groupId/': typeof LayoutMonitoringGroupIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -88,9 +118,11 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
   '/items': typeof LayoutItemsRoute
-  '/monitoring': typeof LayoutMonitoringRoute
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
+  '/monitoring': typeof LayoutMonitoringIndexRoute
+  '/monitoring/$groupId/$serviceId': typeof LayoutMonitoringGroupIdServiceIdRoute
+  '/monitoring/$groupId': typeof LayoutMonitoringGroupIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,9 +133,13 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_layout/admin': typeof LayoutAdminRoute
   '/_layout/items': typeof LayoutItemsRoute
-  '/_layout/monitoring': typeof LayoutMonitoringRoute
+  '/_layout/monitoring': typeof LayoutMonitoringRouteWithChildren
   '/_layout/settings': typeof LayoutSettingsRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/_layout/monitoring/$groupId': typeof LayoutMonitoringGroupIdRouteWithChildren
+  '/_layout/monitoring/': typeof LayoutMonitoringIndexRoute
+  '/_layout/monitoring/$groupId/$serviceId': typeof LayoutMonitoringGroupIdServiceIdRoute
+  '/_layout/monitoring/$groupId/': typeof LayoutMonitoringGroupIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,6 +153,10 @@ export interface FileRouteTypes {
     | '/items'
     | '/monitoring'
     | '/settings'
+    | '/monitoring/$groupId'
+    | '/monitoring/'
+    | '/monitoring/$groupId/$serviceId'
+    | '/monitoring/$groupId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -125,9 +165,11 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin'
     | '/items'
-    | '/monitoring'
     | '/settings'
     | '/'
+    | '/monitoring'
+    | '/monitoring/$groupId/$serviceId'
+    | '/monitoring/$groupId'
   id:
     | '__root__'
     | '/_layout'
@@ -140,6 +182,10 @@ export interface FileRouteTypes {
     | '/_layout/monitoring'
     | '/_layout/settings'
     | '/_layout/'
+    | '/_layout/monitoring/$groupId'
+    | '/_layout/monitoring/'
+    | '/_layout/monitoring/$groupId/$serviceId'
+    | '/_layout/monitoring/$groupId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -222,13 +268,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutSettingsRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/monitoring/': {
+      id: '/_layout/monitoring/'
+      path: '/'
+      fullPath: '/monitoring/'
+      preLoaderRoute: typeof LayoutMonitoringIndexRouteImport
+      parentRoute: typeof LayoutMonitoringRoute
+    }
+    '/_layout/monitoring/$groupId': {
+      id: '/_layout/monitoring/$groupId'
+      path: '/$groupId'
+      fullPath: '/monitoring/$groupId'
+      preLoaderRoute: typeof LayoutMonitoringGroupIdRouteImport
+      parentRoute: typeof LayoutMonitoringRoute
+    }
+    '/_layout/monitoring/$groupId/': {
+      id: '/_layout/monitoring/$groupId/'
+      path: '/'
+      fullPath: '/monitoring/$groupId/'
+      preLoaderRoute: typeof LayoutMonitoringGroupIdIndexRouteImport
+      parentRoute: typeof LayoutMonitoringGroupIdRoute
+    }
+    '/_layout/monitoring/$groupId/$serviceId': {
+      id: '/_layout/monitoring/$groupId/$serviceId'
+      path: '/$serviceId'
+      fullPath: '/monitoring/$groupId/$serviceId'
+      preLoaderRoute: typeof LayoutMonitoringGroupIdServiceIdRouteImport
+      parentRoute: typeof LayoutMonitoringGroupIdRoute
+    }
   }
 }
+
+interface LayoutMonitoringGroupIdRouteChildren {
+  LayoutMonitoringGroupIdServiceIdRoute: typeof LayoutMonitoringGroupIdServiceIdRoute
+  LayoutMonitoringGroupIdIndexRoute: typeof LayoutMonitoringGroupIdIndexRoute
+}
+
+const LayoutMonitoringGroupIdRouteChildren: LayoutMonitoringGroupIdRouteChildren =
+  {
+    LayoutMonitoringGroupIdServiceIdRoute:
+      LayoutMonitoringGroupIdServiceIdRoute,
+    LayoutMonitoringGroupIdIndexRoute: LayoutMonitoringGroupIdIndexRoute,
+  }
+
+const LayoutMonitoringGroupIdRouteWithChildren =
+  LayoutMonitoringGroupIdRoute._addFileChildren(
+    LayoutMonitoringGroupIdRouteChildren,
+  )
+
+interface LayoutMonitoringRouteChildren {
+  LayoutMonitoringGroupIdRoute: typeof LayoutMonitoringGroupIdRouteWithChildren
+  LayoutMonitoringIndexRoute: typeof LayoutMonitoringIndexRoute
+}
+
+const LayoutMonitoringRouteChildren: LayoutMonitoringRouteChildren = {
+  LayoutMonitoringGroupIdRoute: LayoutMonitoringGroupIdRouteWithChildren,
+  LayoutMonitoringIndexRoute: LayoutMonitoringIndexRoute,
+}
+
+const LayoutMonitoringRouteWithChildren =
+  LayoutMonitoringRoute._addFileChildren(LayoutMonitoringRouteChildren)
 
 interface LayoutRouteChildren {
   LayoutAdminRoute: typeof LayoutAdminRoute
   LayoutItemsRoute: typeof LayoutItemsRoute
-  LayoutMonitoringRoute: typeof LayoutMonitoringRoute
+  LayoutMonitoringRoute: typeof LayoutMonitoringRouteWithChildren
   LayoutSettingsRoute: typeof LayoutSettingsRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
 }
@@ -236,7 +340,7 @@ interface LayoutRouteChildren {
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAdminRoute: LayoutAdminRoute,
   LayoutItemsRoute: LayoutItemsRoute,
-  LayoutMonitoringRoute: LayoutMonitoringRoute,
+  LayoutMonitoringRoute: LayoutMonitoringRouteWithChildren,
   LayoutSettingsRoute: LayoutSettingsRoute,
   LayoutIndexRoute: LayoutIndexRoute,
 }
